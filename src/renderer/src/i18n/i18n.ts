@@ -103,6 +103,11 @@ export async function setRendererUiLanguage(language: UiLanguage): Promise<void>
 
 const registeredPluginLanguages = new Set<string>()
 let pluginLanguagePacks: readonly PluginLanguagePackRegistration[] = []
+let pluginLanguagePackRevision = 0
+
+export function getRendererPluginLanguagePackRevision(): number {
+  return pluginLanguagePackRevision
+}
 
 /**
  * BCP-47 tag for `Intl` formatting. Plugin catalogs register under a synthetic
@@ -138,4 +143,5 @@ export function setRendererPluginLanguagePacks(
     i18n.addResourceBundle(pack.resourceLanguage, 'translation', pack.catalog, true, true)
     registeredPluginLanguages.add(pack.resourceLanguage)
   }
+  pluginLanguagePackRevision += 1
 }

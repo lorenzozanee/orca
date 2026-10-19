@@ -1,14 +1,21 @@
-import { i18n } from './i18n'
+import { getRendererPluginLanguagePackRevision, i18n } from './i18n'
 
 // Why: search metadata and catalogs call translate() during build. Caching per
 // active locale keeps lookups cheap while still refreshing after language changes.
 export function createLocalizedCatalog<T>(builder: () => T): () => T {
   let cachedLocale: string | undefined
+  let cachedPluginLanguagePackRevision = -1
   let cachedValue: T | undefined
 
   return () => {
-    if (cachedLocale !== i18n.language || cachedValue === undefined) {
+    const pluginLanguagePackRevision = getRendererPluginLanguagePackRevision()
+    if (
+      cachedLocale !== i18n.language ||
+      cachedPluginLanguagePackRevision !== pluginLanguagePackRevision ||
+      cachedValue === undefined
+    ) {
       cachedLocale = i18n.language
+      cachedPluginLanguagePackRevision = pluginLanguagePackRevision
       cachedValue = builder()
     }
     return cachedValue
