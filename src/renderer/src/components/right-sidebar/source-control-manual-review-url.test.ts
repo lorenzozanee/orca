@@ -4,6 +4,7 @@ import {
   buildSourceControlManualReviewUrlFromContext,
   resolveSourceControlManualReviewProvider
 } from './source-control/review/manual-review-url'
+import { parseRemoteRepo } from './source-control/review/remote-repo'
 
 describe('resolveSourceControlManualReviewProvider', () => {
   it('prefers hosted review and creation providers over linked review hints', () => {
@@ -78,6 +79,29 @@ describe('buildSourceControlManualReviewUrlFromContext', () => {
 })
 
 describe('buildSourceControlManualReviewUrl', () => {
+  it('canonicalizes GitLab SSH-over-443 web identity without changing the supplied remote', () => {
+    const remote = 'ssh://git@altssh.gitlab.com:443/team/project.git'
+
+    expect(parseRemoteRepo(remote)).toEqual({
+      provider: 'gitlab',
+      path: 'team/project',
+      webBaseUrl: 'https://gitlab.com/team/project'
+    })
+    expect(remote).toBe('ssh://git@altssh.gitlab.com:443/team/project.git')
+    expect(
+      buildSourceControlManualReviewUrl({
+        baseRef: 'main',
+        branchName: 'feature',
+        repoRemoteName: 'origin',
+        repoRemoteUrl: remote,
+        provider: 'gitlab',
+        upstreamName: 'origin/feature'
+      })
+    ).toBe(
+      'https://gitlab.com/team/project/-/merge_requests/new?merge_request%5Bsource_branch%5D=feature&merge_request%5Btarget_branch%5D=main'
+    )
+  })
+
   it('builds a GitHub compare URL for the current remote branch', () => {
     expect(
       buildSourceControlManualReviewUrl({

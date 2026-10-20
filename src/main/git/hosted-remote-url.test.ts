@@ -27,6 +27,11 @@ describe('hosted remote URLs', () => {
       path: 'Org/Repo',
       provider: 'github'
     })
+    expect(parseHostedRemote('ssh://git@altssh.gitlab.com:443/team/project.git')).toEqual({
+      host: 'gitlab.com',
+      path: 'team/project',
+      provider: 'gitlab'
+    })
     expect(parseHostedRemote('github:Org/Repo')).toEqual({
       host: 'github.com',
       path: 'Org/Repo',

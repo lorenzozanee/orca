@@ -13,6 +13,13 @@ describe('gitlab project ref parsing', () => {
     })
   })
 
+  it('parses GitLab.com SSH-over-443 remotes as the canonical GitLab host', () => {
+    expect(parseGitLabProjectRef('ssh://git@altssh.gitlab.com:443/team/project.git')).toEqual({
+      host: 'gitlab.com',
+      path: 'team/project'
+    })
+  })
+
   it('preserves nested group paths', () => {
     expect(parseGitLabProjectRef('git@gitlab.com:group/subgroup/project.git')).toEqual({
       host: 'gitlab.com',
